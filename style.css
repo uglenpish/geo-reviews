@@ -1,0 +1,150 @@
+body {
+	background: cadetblue;
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.42;
+  padding: 0;
+  position: relative;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+ul li {
+  list-style: none;
+}
+
+a{
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+}
+
+.container{
+	width: 290px;
+	margin: 0 auto;
+}
+
+.container__flex{
+	display: flex;
+	align-items: center;
+	height: 100%;
+	position: relative;
+}
+
+#map {
+  width: 100%;
+  height: 100vh;
+}
+
+.popup{
+	/*opacity: 0;*/
+	display: flex;
+	flex-direction: column;
+	position: absolute;
+	left: -9999px;
+	top: 0;
+	background: #fff;
+	width: 330px;
+	max-height: 525px;
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.header{
+	width: 100%;
+	height: 45px;
+	background: #ff8663;
+
+}
+
+.header__logo{
+	width: 10px;
+	height: 16px;
+	object-fit: cover;
+}
+
+.header__img{
+	width: 100%;
+	height: 100%;
+}
+
+.header__adress{
+	padding-left: 10px;
+	color: #fff;
+	font-size: 14px;
+}
+
+.popup__close{
+	display: block;
+	width: 14px;
+	height: 14px;
+	position: absolute;
+	right: 0;
+	top: 14px;
+}
+
+.form{
+	display: flex;
+	flex-direction: column;
+	padding-bottom: 10px;
+}
+
+.form__title{
+	font-size: 16px;
+	color: #ff8663;
+	font-weight: 500;
+	font-family: "Fira Sans";
+}
+
+.input{
+	outline: none;
+	margin-bottom: 15px;
+	border-radius: 16px;
+	border: 1px solid #c4c4c4;
+	padding: 7px;
+}
+
+.form__btn{
+	width: 87px;
+	height: 30px;
+	border-radius: 10px;
+	background-color: #ff8663;
+	border: none;
+	color: #fff;
+}
+
+.border{
+	width: 100%;
+	height: 1px;
+	background: #c4c4c4;
+}
+
+.reviews{
+	display: flex;
+	flex-direction: column;
+}
+
+.reviews__list{
+  max-height: 160px;
+
+  overflow-y: scroll;
+  padding: 7px;
+  color: #4f4f4f;
+}
+
+.reviews__item-name{
+  font-weight: bold;
+  padding-right: 7px;
+
+}
+.reviews__item-spot{
+  padding-right: 10px;
+}
+.reviews__item-text{
+  padding: 10px 0;
+}
