@@ -1,7 +1,8 @@
 let objectManager;
 let objectId = 0;
 let adress;
-let reviews = {}
+let reviews = [];
+let coords;
 
 // const dataBase = [];
 
@@ -35,17 +36,14 @@ mapInit();
 function addListeners(myMap) {
   myMap.events.add('click', function (e) {
 
-    var coords = e.get('coords');
-    // console.log(coords);
-    // console.log(objectId);
+    coords = e.get('coords');
     
-
     let posX = e.getSourceEvent().originalEvent.domEvent.originalEvent
         .clientX;
     let posY = e.getSourceEvent().originalEvent.domEvent.originalEvent
         .clientY;
     
-    onPopup(posX, posY, coords);
+    onPopup(posX, posY);
   });
 
   myMap.geoObjects.events.add('click', function (e) {
@@ -55,55 +53,25 @@ function addListeners(myMap) {
   });
 }
 
- // Создание метки.
-// var myPlacemark;
-// function createPlacemark(coords) {
-//   return new ymaps.Placemark(coords,  {
-//     preset: 'islands#violetDotIconWithCaption',
-//   });
-// }
-
-// Определяем адрес по координатам (обратное геокодирование).
-function getAddress(coords) {
-  // myPlacemark.properties.set();
-  ymaps.geocode(coords).then(function (res) {
-  	var firstGeoObject = res.geoObjects.get(0);
-  	adress = firstGeoObject.getAddressLine();
-
-		// myPlacemark.properties
-  //   .set({
-  //       // Формируем строку с данными об объекте.
-  //       hintContent: [
-  //         // Название населенного пункта или вышестоящее административно-территориальное образование.
-  //         firstGeoObject.getLocalities().length ? firstGeoObject.getLocalities() : firstGeoObject.getAdministrativeAreas(),
-  //         // Получаем путь до топонима, если метод вернул null, запрашиваем наименование здания.
-  //         firstGeoObject.getThoroughfare() || firstGeoObject.getPremise()
-  //       ].filter(Boolean).join(', '),
-  //       // В качестве контента балуна задаем строку с адресом объекта.
-  //       balloonContent: adress
-  //     });
-    return adress;
-  });
-}
-
-function onPopup(posX, posY, coords){
+function onPopup(posX, posY){
 	const popup = document.querySelector('.popup');
 	const adressMap = document.querySelector('.header__adress');
   const btn = document.querySelector('.form__btn');
   const close = document.querySelector('#popup__close');
   
-  getAddress(coords);
-  console.log(coords);
-  console.log(adress);
-  adressMap.textContent = adress;
+  getAdress(coords)
+    .then(res => {
+      adress = res,
+      adressMap.textContent = adress
+    })
+ 
 
   popup.style.left = posX + 'px';
   popup.style.top = posY + 'px';
 
-  btn.addEventListener('click', function(event) {
-    event.preventDefault();
-    createPlacemark(coords);
-    recordForm(coords);
+  btn.addEventListener('click', e => {
+    e.preventDefault();
+    recordForm();
     popup.style.left = -9999 + 'px';
     
   });
@@ -114,7 +82,7 @@ function onPopup(posX, posY, coords){
   })
 }
 
-function recordForm(coords) {
+function recordForm() {
   const form = document.querySelector('.form');
   const nameForm = document.querySelector('.form__name').value;
   const spotForm = document.querySelector('.form__spot').value;
@@ -123,18 +91,25 @@ function recordForm(coords) {
     let pl = {
       objectId: objectId,
       coords: coords,
-      review: {}
+      review: {
+        name: nameForm,
+        spot: spotForm,
+        comment: commentForm
+      }
     }
 
-    const formElements = [...form.elements]
-    .filter(elem => elem.tagName !== 'BUTTON');
+    // const formElements = [...form.elements]
+    // .filter(elem => elem.tagName !== 'BUTTON');
 
-    for(const elem of formElements){
-      pl.review[elem.name] = elem.value;
-    }
+    // for(const elem of formElements){
+    //   pl.review[elem.name] = elem.value;
+    // }
 
     console.log(pl);
-    // reviews.push(pl);
+    reviews.push(pl);
+    createPlacemark();
+    clearForm();
+    coords = null;
     objectId++;
   
 
@@ -147,4 +122,51 @@ function createPlacemark(coords){
   // });
 };
 
+function getAdress(coords){
+  return new Promise((resolve, reject) => {
+    ymaps.geocode(coords)
+      .then(response => resolve(response.geoObjects.get(0).getAddressLine()))
+      .catch(e => reject(e))
+  })
+}
 
+function clearForm(){
+  document.querySelector('.form__name').value = '';
+  document.querySelector('.form__spot').value = '';
+  document.querySelector('.form__comment').value = '';
+}
+
+
+
+
+ // Создание метки.
+// var myPlacemark;
+// function createPlacemark(coords) {
+//   return new ymaps.Placemark(coords,  {
+//     preset: 'islands#violetDotIconWithCaption',
+//   });
+// }
+
+// Определяем адрес по координатам (обратное геокодирование).
+// function getAddress(coords) {
+//   // myPlacemark.properties.set();
+//   ymaps.geocode(coords).then(function (res) {
+//    var firstGeoObject = res.geoObjects.get(0);
+//    adress = firstGeoObject.getAddressLine();
+//    //  console.log(adress);
+
+//    // myPlacemark.properties
+//   //   .set({
+//   //       // Формируем строку с данными об объекте.
+//   //       hintContent: [
+//   //         // Название населенного пункта или вышестоящее административно-территориальное образование.
+//   //         firstGeoObject.getLocalities().length ? firstGeoObject.getLocalities() : firstGeoObject.getAdministrativeAreas(),
+//   //         // Получаем путь до топонима, если метод вернул null, запрашиваем наименование здания.
+//   //         firstGeoObject.getThoroughfare() || firstGeoObject.getPremise()
+//   //       ].filter(Boolean).join(', '),
+//   //       // В качестве контента балуна задаем строку с адресом объекта.
+//   //       balloonContent: adress
+//   //     });
+//     // return adress;
+//   });
+// }
