@@ -111,7 +111,9 @@ img {
 
 .form__btn{
 	width: 87px;
-	height: 30px;
+	padding: 5px;
+	text-align: center;
+	cursor: pointer;
 	border-radius: 10px;
 	background-color: #ff8663;
 	border: none;

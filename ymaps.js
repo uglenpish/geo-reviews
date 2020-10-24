@@ -3,6 +3,7 @@ let objectId = 0;
 let adress;
 let reviews = [];
 let coords;
+let myMap;
 
 // const dataBase = [];
 
@@ -14,7 +15,7 @@ let coords;
 
 function mapInit() { 
   ymaps.ready(() => { 
-    let myMap = new ymaps.Map('map', {
+    myMap = new ymaps.Map('map', {
       center: [51.67, 39.22],
       zoom: 13,
       controls: ['zoomControl'],
@@ -47,9 +48,12 @@ function addListeners(myMap) {
   });
 
   myMap.geoObjects.events.add('click', function (e) {
+    
+    let pos = e.get('position');
+    showReview();
+    onPopup(pos[0], pos[1]);
     // Получение ссылки на дочерний объект, на котором произошло событие.
-    var object = e.get('target');
-    console.log(1);
+    
   });
 }
 
@@ -69,57 +73,54 @@ function onPopup(posX, posY){
   popup.style.left = posX + 'px';
   popup.style.top = posY + 'px';
 
-  btn.addEventListener('click', e => {
-    e.preventDefault();
-    recordForm();
-    popup.style.left = -9999 + 'px';
-    
-  });
+  btn.addEventListener('click', recordForm);
 
   close.addEventListener('click', (e) => {
     e.preventDefault();
-    popup.style.left = -9999 + 'px';
-  })
-}
+    closePopup();
+  });
+};
 
 function recordForm() {
   const form = document.querySelector('.form');
-  const nameForm = document.querySelector('.form__name').value;
-  const spotForm = document.querySelector('.form__spot').value;
-  const commentForm = document.querySelector('.form__comment').value;
-    
+
     let pl = {
       objectId: objectId,
       coords: coords,
-      review: {
-        name: nameForm,
-        spot: spotForm,
-        comment: commentForm
-      }
+      adress: adress,
+      review: {}
     }
 
-    // const formElements = [...form.elements]
-    // .filter(elem => elem.tagName !== 'BUTTON');
+    const formElements = [...form.elements]
+    .filter(elem => elem.tagName !== 'BUTTON');
 
-    // for(const elem of formElements){
-    //   pl.review[elem.name] = elem.value;
-    // }
+    for(const elem of formElements){
+      pl.review[elem.name] = elem.value;
+    }
 
-    console.log(pl);
     reviews.push(pl);
-    createPlacemark();
+    createPlacemark(pl);
     clearForm();
-    coords = null;
     objectId++;
-  
+    closePopup();
+    // console.log(reviews);
+};
 
-  console.log(reviews);
-}
+function createPlacemark(obj){
+  let featuresObj = {
+    'type': 'Feature',
+    'id': obj.objectId,
+    'geometry': {
+      'type': 'Point',
+      'coordinates': obj.coords
+    },
+    'properties': {}
+  };
 
-function createPlacemark(coords){
-  // return new ymaps.Placemark(coords,  {
-  //   preset: 'islands#violetDotIconWithCaption',
-  // });
+  objectManager.add({
+    'type': 'FeatureCollection',
+    'features': [featuresObj]
+  });
 };
 
 function getAdress(coords){
@@ -128,15 +129,47 @@ function getAdress(coords){
       .then(response => resolve(response.geoObjects.get(0).getAddressLine()))
       .catch(e => reject(e))
   })
-}
+};
 
 function clearForm(){
   document.querySelector('.form__name').value = '';
   document.querySelector('.form__spot').value = '';
   document.querySelector('.form__comment').value = '';
-}
+};
 
+function closePopup(){
+  const popup = document.querySelector('.popup');
+  popup.style.left = -9999 + 'px';
+};
 
+function showReview(){
+  // let data = [];
+  // console.log(adress);
+  // for(let i in reviews){
+  //   let items = reviews[i];
+  //   // console.log(items.adress);
+
+  //   if(items.adress === adress){
+  //     console.log(items.review);
+  //     // data.push(items.review);
+  //     // console.log(data);
+  //     // createReview(obj);
+  //   }
+  // }
+};
+
+function createReview(obj){
+  const reviewsItem = document.createElement('div');
+        reviewsItem.classList.add('reviews__item');
+        reviewsItem.innerHTML = `            
+          <div class="reviews__item-header">
+          <span class="reviews__item-name">${review.name}</span>
+          <span class="reviews__item-spot">${review.spot}</span>
+          <span class="reviews__data">${review.data}</span>
+          </div>
+          <div class="reviews__item-text">${review.comment}</div>          
+        `;
+};
 
 
  // Создание метки.
